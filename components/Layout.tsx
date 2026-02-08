@@ -88,19 +88,22 @@ const Layout: React.FC = () => {
              </div>
           </div>
 
-          <nav className="hidden md:flex items-center justify-center flex-wrap gap-x-12 gap-y-4 w-full">
-            {navItems.map((item) => (
-              <NavLink key={item.path} to={item.path} className={({ isActive }) =>
-                  `text-3xl font-bold transition-all transform hover:scale-110 ${
-                    isActive ? 'text-[#f6a118] border-b-4 border-[#fadb31]' : 'text-gray-400 hover:text-[#ea7e9c]'
-                  }`
-                }>
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-
+         {/* Nav con Scroll Horizontal en móviles */}
+<nav className="flex items-center justify-start md:justify-center overflow-x-auto no-scrollbar gap-x-8 gap-y-2 w-full px-4 py-2">
+  {navItems.map((item) => (
+    <NavLink 
+      key={item.path} 
+      to={item.path} 
+      className={({ isActive }) =>
+        `text-xl font-bold transition-all transform hover:scale-105 whitespace-nowrap ${
+          isActive ? 'text-[#f6a118] border-b-2 border-[#fadb31]' : 'text-gray-400 hover:text-[#ea7e9c]'
+        }`
+      }
+    >
+      {item.label}
+    </NavLink>
+  ))}
+</nav>
         {isMenuOpen && (
           <div className="md:hidden bg-[#fdfaf6] border-t-8 border-[#fadb31] py-16 px-10 flex flex-col items-center gap-12 animate-fadeIn h-screen overflow-y-auto">
              <div className="flex items-center gap-4 mb-8">
