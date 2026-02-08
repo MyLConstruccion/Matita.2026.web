@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Product, Category, User, Sale, ColorStock } from '../types';
 import { useApp } from '../App';
@@ -185,7 +184,7 @@ const Dashboard: React.FC = () => {
   );
 };
 
-// --- COMPONENTE INVENTORY MANAGER (CON FIX DE NÚMEROS Y CLOUDINARY) ---
+// --- COMPONENTE INVENTORY MANAGER ---
 const InventoryManager: React.FC = () => {
   const { supabase } = useApp();
   const [products, setProducts] = useState<Product[]>([]);
@@ -217,7 +216,6 @@ const InventoryManager: React.FC = () => {
   const handleSave = async () => {
     if (!editingProduct?.name) return alert('¡Escribe el nombre del tesoro!');
     
-    // Forzamos conversión a Number para evitar problemas de base de datos
     const p = { 
       name: editingProduct.name,
       description: editingProduct.description || "",
@@ -252,7 +250,7 @@ const InventoryManager: React.FC = () => {
         body: formData,
       });
       const data = await res.json();
-      return data.secure_url; // Guardamos la URL optimizada directamente
+      return data.secure_url;
     } catch (error) {
       console.error("Cloudinary error:", error);
       return null;
@@ -519,14 +517,66 @@ const IdeasManager: React.FC = () => {
   );
 };
 
-// --- COMPONENTE DESIGN MANAGER ---
+// --- COMPONENTE DESIGN MANAGER (CORREGIDO PARA GUARDAR EL LOGO) ---
 const DesignManager: React.FC = () => {
   const { logoUrl, setLogoUrl, supabase } = useApp();
   const fRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
+  // Función para subir a Cloudinary el logo
+  const uploadLogoToCloudinary = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "Matita_web"); 
+    formData.append("folder", "branding");
+
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dllm8ggob/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error("Error subiendo logo:", error);
+      return null;
+    }
+  };
+
   const saveDesign = async () => {
-    const { error } = await supabase.from('site_config').upsert({ id: 'global', logo_url: logoUrl });
-    if (error) alert(error.message); else alert('✨ ¡Imagen de Marca Actualizada! ✨');
+    setIsSaving(true);
+    let finalLogoUrl = logoUrl;
+
+    // Si hay un archivo nuevo seleccionado, lo subimos primero
+    if (selectedFile) {
+      const uploadedUrl = await uploadLogoToCloudinary(selectedFile);
+      if (uploadedUrl) {
+        finalLogoUrl = uploadedUrl;
+        setLogoUrl(uploadedUrl); // Actualizamos el estado global
+      }
+    }
+
+    const { error } = await supabase.from('site_config').upsert({ id: 'global', logo_url: finalLogoUrl });
+    
+    if (error) {
+      alert("Error al guardar: " + error.message);
+    } else {
+      alert('✨ ¡Imagen de Marca Actualizada en la Nube! ✨');
+      setSelectedFile(null); // Limpiamos el archivo pendiente
+    }
+    setIsSaving(false);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) {
+      setSelectedFile(f);
+      // Mostrar preview local inmediata
+      const reader = new FileReader();
+      reader.onloadend = () => setLogoUrl(reader.result as string);
+      reader.readAsDataURL(f);
+    }
   };
 
   return (
@@ -539,13 +589,17 @@ const DesignManager: React.FC = () => {
               <p className="text-white font-bold text-4xl">Cambiar</p>
            </div>
         </div>
-        <input type="file" ref={fRef} className="hidden" onChange={e => {
-          const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onloadend = () => setLogoUrl(r.result as string); r.readAsDataURL(f); }
-        }} />
+        <input type="file" ref={fRef} className="hidden" onChange={handleFileChange} accept="image/*" />
         <div className="space-y-10">
-           <p className="text-2xl text-gray-400 italic">"Este logo aparecerá en el inicio y en el carrito." 🌸</p>
-           <button onClick={saveDesign} className="w-full py-8 matita-gradient-orange text-white rounded-[3rem] text-5xl font-bold shadow-2xl border-4 border-white hover:scale-105 active:scale-95 transition-all">
-              Guardar Identidad
+           <p className="text-2xl text-gray-400 italic">
+             {selectedFile ? "📸 Logo listo para subir..." : '"Este logo aparecerá en el inicio y en el carrito." 🌸'}
+           </p>
+           <button 
+              onClick={saveDesign} 
+              disabled={isSaving}
+              className="w-full py-8 matita-gradient-orange text-white rounded-[3rem] text-5xl font-bold shadow-2xl border-4 border-white hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+           >
+              {isSaving ? "Guardando..." : "Guardar Identidad"}
            </button>
         </div>
       </div>
