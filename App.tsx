@@ -11,8 +11,9 @@ import Ideas from './components/Ideas';
 import Contact from './components/Contact';
 import { Product, CartItem, User, Category } from './types';
 
-const SUPABASE_URL = 'https://jjgvfzaxcxfgyziikybd.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_hNWUKMZrLljdMaVN8NgWcw_b9UR3nVS';
+// DATOS DE TU NUEVO PROYECTO SUPABASE
+const SUPABASE_URL = 'https://xlwkzoapfbpoxaccvoea.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_knGPyLLlMsy-YCQIblQnbQ_nrC8rV6x';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
