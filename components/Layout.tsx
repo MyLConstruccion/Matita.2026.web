@@ -53,7 +53,7 @@ const Layout: React.FC = () => {
         <div className="absolute inset-0 bg-black/10"></div>
       </section>
 
-      {/* SECCIÓN 2: Header que NO arruina el scroll */}
+      {/* SECCIÓN 2: Header Principal */}
       <header className="bg-white/95 backdrop-blur-md relative z-40 py-8 shadow-xl border-b-4 border-[#fadb31]/30">
         <div className="container mx-auto px-6 flex flex-col items-center gap-8">
           <div className="flex items-center justify-between w-full max-w-7xl">
@@ -103,7 +103,6 @@ const Layout: React.FC = () => {
           </nav>
         </div>
 
-        {/* Menú Mobile con el estilo original */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-50 bg-[#fdfaf6] border-t-8 border-[#fadb31] py-16 px-10 flex flex-col items-center gap-12 animate-fadeIn overflow-y-auto">
             <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 text-6xl text-[#f6a118]">✕</button>
@@ -121,14 +120,15 @@ const Layout: React.FC = () => {
         )}
       </header>
 
-      {/* SECCIÓN 3: El área de productos (Arreglado para que luzca bien) */}
-      <main className="container mx-auto flex-grow px-4 md:px-12 py-16 relative z-10">
-        <div className="bg-white/50 rounded-[3rem] p-4 md:p-8 shadow-sm">
+      {/* SECCIÓN 3: Área de productos CORREGIDA */}
+      {/* Eliminamos el contenedor con fondo blanco que limitaba el diseño de las tarjetas */}
+      <main className="w-full flex-grow py-12">
+        <div className="container mx-auto px-4 md:px-6">
           <Outlet />
         </div>
       </main>
 
-      {/* SECCIÓN 4: Footer Matita (Recuperado al 100%) */}
+      {/* SECCIÓN 4: Footer Matita */}
       <footer className="bg-[#fadb31]/10 border-t-[10px] border-[#fadb31]/40 py-24 relative overflow-hidden">
         <div className="absolute top-0 left-10 text-[10rem] opacity-5 rotate-12 pointer-events-none">✏️</div>
         <div className="absolute bottom-10 right-10 text-[10rem] opacity-5 -rotate-12 pointer-events-none">🎨</div>
