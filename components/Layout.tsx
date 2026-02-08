@@ -43,7 +43,7 @@ const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-matita bg-[#fffdf9]">
-      {/* SECCIÓN 1: Banner Superior con Estilo Matita */}
+      {/* SECCIÓN 1: Banner Superior */}
       <section className="w-full h-48 md:h-72 relative overflow-hidden border-b-8 border-[#fadb31] shadow-2xl">
         {bannerImages.map((img, idx) => (
           <div key={idx} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100' : 'opacity-0'}`}>
@@ -120,11 +120,13 @@ const Layout: React.FC = () => {
         )}
       </header>
 
-      {/* SECCIÓN 3: Área de productos CORREGIDA */}
-      {/* Eliminamos el contenedor con fondo blanco que limitaba el diseño de las tarjetas */}
+      {/* SECCIÓN 3: Área de productos (Optimizada para mayor tamaño y visibilidad) */}
       <main className="w-full flex-grow py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <Outlet />
+        <div className="container mx-auto px-4 md:px-10 max-w-screen-2xl">
+          {/* Este div ayuda a que el Outlet se expanda y use fuentes proporcionales */}
+          <div className="products-display-area">
+             <Outlet />
+          </div>
         </div>
       </main>
 
