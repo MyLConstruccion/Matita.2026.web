@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { Product, Category } from '../types';
 import { useApp } from '../App';
@@ -9,25 +11,15 @@ interface CatalogProps {
 
 const Catalog: React.FC<CatalogProps> = ({ category }) => {
   const { favorites, supabase } = useApp();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const titles: Record<string, string> = {
-    Catalog: 'Todo Nuestro Mundo ✨',
-    Escolar: 'Útiles Escolares ✏️',
-    Regalaría: 'Para Regalar 🎁',
-    Oficina: 'Tu Oficina Matita 💼',
-    Tecnología: 'Tecnología & Más 🎧',
-    Novedades: '¡Recién Llegado! 🆕',
-    Ofertas: 'Precios Increíbles 🏷️',
-    Favorites: 'Mis Tesoros ❤️'
-  };
-
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
@@ -37,9 +29,9 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
           id: p.id,
           name: p.name,
           description: p.description,
-          price: Number(p.price) || 0,
-          oldPrice: p.old_price ? Number(p.old_price) : undefined,
-          points: Math.floor(Number(p.points)) || 0,
+          price: p.price,
+          oldPrice: p.old_price,
+          points: p.points,
           category: p.category,
           images: p.images || [],
           colors: p.colors || []
@@ -49,114 +41,110 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
     };
 
     fetchProducts();
-  }, [supabase]);
+  }, [supabase, category]);
 
-  // 1. Filtrado base por búsqueda y favoritos
-  const filteredBase = useMemo(() => {
+  const filteredProducts = useMemo(() => {
     return products.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-      if (category === 'Favorites') return matchesSearch && favorites.includes(p.id);
-      if (category === 'Ofertas') {
-        const hasDiscount = p.oldPrice && p.oldPrice > p.price;
-        return matchesSearch && (hasDiscount || p.category === 'Ofertas');
+      
+      if (category === 'Favorites') {
+        return matchesSearch && favorites.includes(p.id);
       }
-      if (category !== 'Catalog') return matchesSearch && p.category === category;
-      return matchesSearch;
+      if (category === 'Catalog') {
+        return matchesSearch;
+      }
+      if (category === 'Ofertas') {
+        return matchesSearch && (p.oldPrice !== null || p.category === 'Ofertas');
+      }
+      
+      return matchesSearch && p.category === category;
     });
   }, [category, searchTerm, favorites, products]);
 
-  // 2. Agrupación por categorías para la vista "Catalog"
-  const groupedProducts = useMemo(() => {
-    if (category !== 'Catalog') return null;
-    
-    const groups: Record<string, Product[]> = {};
-    filteredBase.forEach(p => {
-      if (!groups[p.category]) groups[p.category] = [];
-      groups[p.category].push(p);
-    });
-    return groups;
-  }, [category, filteredBase]);
+  const categoryList: {label: string, cat: Category, icon: string}[] = [
+    { label: 'Escolar', cat: 'Escolar', icon: '✏️' },
+    { label: 'Regalaría', cat: 'Regalaría', icon: '🎁' },
+    { label: 'Oficina', cat: 'Oficina', icon: '💼' },
+    { label: 'Tecnología', cat: 'Tecnología', icon: '🎧' },
+    { label: 'Novedades', cat: 'Novedades', icon: '✨' },
+    { label: 'Ofertas', cat: 'Ofertas', icon: '🏷️' }
+  ];
+
+  const titles = {
+    Catalog: 'Mundo Matita ✨',
+    Escolar: 'Útiles Escolares ✏️',
+    Regalaría: 'Para Regalar 🎁',
+    Oficina: 'Tu Oficina 💼',
+    Tecnología: 'Tecnología 🎧',
+    Novedades: '¡Recién Llegado! 🆕',
+    Ofertas: '¡Imperdibles! 🏷️',
+    Favorites: 'Mis Favoritos ❤️'
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-40">
-        <div className="w-16 h-16 border-4 border-[#fadb31] border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center py-40 gap-4">
+        <div className="w-20 h-20 border-8 border-[#fadb31] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[#f6a118] font-bold animate-pulse text-3xl">Buscando tesoros...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-20 animate-fadeIn">
+    <div className="space-y-12 animate-fadeIn pb-24 px-2 md:px-6">
       {/* Header y Buscador */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
         <div>
-          <h2 className="text-6xl font-matita font-bold text-[#f6a118] drop-shadow-sm">
-            {titles[category]}
+           <h2 className="text-5xl md:text-7xl font-matita font-bold text-[#f6a118] drop-shadow-sm">
+            {titles[category as keyof typeof titles]}
           </h2>
-          <p className="text-2xl font-matita text-gray-400 mt-2 italic">Descubre la magia de la papelería.</p>
+          <p className="text-2xl md:text-3xl font-matita text-gray-400 mt-3 italic">Descubre la magia en cada detalle.</p>
         </div>
-        
-        <div className="relative max-w-xl w-full group">
+        <div className="relative max-w-2xl w-full">
           <input
             type="text"
-            placeholder="Buscar en esta sección..."
+            placeholder="¿Qué buscas hoy?"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-10 py-5 rounded-[2.5rem] border-4 border-[#fadb31] focus:outline-none focus:ring-8 focus:ring-[#fadb31]/10 text-2xl font-matita shadow-xl transition-all"
+            className="w-full px-10 py-5 rounded-[2.5rem] border-4 border-[#fadb31] text-2xl font-matita shadow-xl focus:ring-[12px] focus:ring-[#fadb31]/10 outline-none transition-all"
           />
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#f6a118]">
-             <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-             </svg>
-          </div>
+          <span className="absolute right-8 top-1/2 -translate-y-1/2 text-4xl">🔍</span>
         </div>
       </div>
 
-      {/* Renderizado de Productos */}
-      {category === 'Catalog' && groupedProducts ? (
-        // VISTA POR SECCIONES (Catalog)
-        <div className="space-y-32">
-          {Object.entries(groupedProducts).map(([catName, catProducts]) => (
-            <div key={catName} className="space-y-10">
-              <div className="flex items-center gap-6">
-                <div className="h-1 flex-grow bg-gradient-to-r from-[#fadb31]/40 to-transparent rounded-full"></div>
-                <h3 className="text-4xl font-matita font-bold text-[#f6a118] bg-[#fef9eb] px-8 py-2 rounded-full border-2 border-[#fadb31]/20">
-                  {titles[catName] || catName}
-                </h3>
-                <div className="h-1 flex-grow bg-gradient-to-l from-[#fadb31]/40 to-transparent rounded-full"></div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20">
-                {catProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </div>
-          ))}
+      {/* Barra de Categorías */}
+      <div className="bg-white/60 p-5 rounded-[3.5rem] border-4 border-white shadow-sm overflow-hidden backdrop-blur-sm">
+        <div className="flex overflow-x-auto gap-5 py-3 scrollbar-hide px-3 items-center">
+           <button 
+             onClick={() => navigate('/catalog')}
+             className={`px-10 py-4 rounded-[2rem] text-2xl font-bold transition-all whitespace-nowrap border-4 ${category === 'Catalog' ? 'matita-gradient-orange text-white border-white shadow-xl scale-110' : 'bg-white text-gray-400 border-transparent hover:text-[#f6a118] hover:border-[#fadb31]'}`}
+           >
+             🌈 Todo
+           </button>
+           {categoryList.map(item => (
+             <button 
+               key={item.cat}
+               onClick={() => navigate(`/${item.cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`)}
+               className={`px-10 py-4 rounded-[2rem] text-2xl font-bold transition-all whitespace-nowrap border-4 ${category === item.cat ? 'matita-gradient-orange text-white border-white shadow-xl scale-110' : 'bg-white text-gray-400 border-transparent hover:text-[#f6a118] hover:border-[#fadb31]'}`}
+             >
+               {item.icon} {item.label}
+             </button>
+           ))}
         </div>
-      ) : (
-        // VISTA SIMPLE (Categoría específica o Favoritos)
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20">
-          {filteredBase.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      </div>
 
-      {/* Empty State */}
-      {filteredBase.length === 0 && (
-        <div className="text-center py-40 space-y-8">
-          <div className="text-8xl opacity-40">🌸</div>
-          <p className="text-4xl font-matita text-gray-300 italic">
-            {category === 'Favorites' 
-              ? 'Aún no guardaste nada especial...' 
-              : 'Parece que no hay tesoros con ese nombre...'}
-          </p>
-          <button 
-            onClick={() => setSearchTerm('')} 
-            className="text-[#f6a118] font-matita text-2xl underline hover:text-[#fadb31] transition-colors"
-          >
-            Ver todo el catálogo
-          </button>
+      {/* Grilla de Productos - AJUSTADA PARA EVITAR CARDS GIGANTES */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12">
+        {filteredProducts.map(product => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-40 space-y-8 bg-white/40 rounded-[5rem] border-8 border-dashed border-white">
+          <div className="text-[12rem] opacity-20 grayscale">🌸</div>
+          <p className="text-4xl font-matita text-gray-400 italic">"Aún no hay tesoros aquí..."</p>
+          <button onClick={() => navigate('/catalog')} className="px-14 py-6 matita-gradient-orange text-white rounded-full font-bold text-3xl shadow-2xl hover:scale-110 transition-all">Ver catálogo completo</button>
         </div>
       )}
     </div>
