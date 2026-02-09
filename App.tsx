@@ -11,7 +11,7 @@ import Ideas from './components/Ideas';
 import Contact from './components/Contact';
 import { Product, CartItem, User, Category } from './types';
 
-// NUEVOS DATOS DEL PROYECTO SUPABASE
+// DATOS DEL PROYECTO SUPABASE (jjgvfzaxcxfgyziikybd)
 const SUPABASE_URL = 'https://jjgvfzaxcxfgyziikybd.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_hNWUKMZrLljdMaVN8NgWcw_b9UR3nVS';
 
@@ -151,7 +151,8 @@ const App: React.FC = () => {
               <Route path="novelties" element={<Catalog category="Novedades" />} />
               <Route path="ofertas" element={<Catalog category="Ofertas" />} />
               <Route path="favorites" element={<Catalog category="Favorites" />} />
-              <Route path="club" element={user.isSocio ? <ClubView /> : <Navigate to="/catalog" />} />
+              {/* Ahora permitimos entrar al club, la lógica interna maneja si es socio o no */}
+              <Route path="club" element={<ClubView />} />
               <Route path="ideas" element={<Ideas />} />
               <Route path="contact" element={<Contact />} />
               <Route path="admin" element={<AdminPanel />} />
@@ -159,19 +160,6 @@ const App: React.FC = () => {
           )}
         </Routes>
       </HashRouter>
-      
-      {user && (
-        <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-50">
-          <a href="https://instagram.com/libreriamatita" target="_blank" rel="noreferrer" 
-             className="w-16 h-16 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform border-2 border-white">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" className="w-10 h-10" alt="Instagram" />
-          </a>
-          <a href="https://wa.me/5493517587003" target="_blank" rel="noreferrer" 
-             className="w-16 h-16 matita-gradient-orange rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform border-2 border-white">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" className="w-10 h-10" alt="WhatsApp" />
-          </a>
-        </div>
-      )}
     </AppContext.Provider>
   );
 };
