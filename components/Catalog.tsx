@@ -13,10 +13,21 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const titles: Record<string, string> = {
+    Catalog: 'Todo Nuestro Mundo ✨',
+    Escolar: 'Útiles Escolares ✏️',
+    Regalaría: 'Para Regalar 🎁',
+    Oficina: 'Tu Oficina Matita 💼',
+    Tecnología: 'Tecnología & Más 🎧',
+    Novedades: '¡Recién Llegado! 🆕',
+    Ofertas: 'Precios Increíbles 🏷️',
+    Favorites: 'Mis Tesoros ❤️'
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
@@ -26,7 +37,6 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
           id: p.id,
           name: p.name,
           description: p.description,
-          // Forzamos conversión numérica para evitar errores visuales
           price: Number(p.price) || 0,
           oldPrice: p.old_price ? Number(p.old_price) : undefined,
           points: Math.floor(Number(p.points)) || 0,
@@ -41,36 +51,31 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
     fetchProducts();
   }, [supabase]);
 
-  const filteredProducts = useMemo(() => {
+  // 1. Filtrado base por búsqueda y favoritos
+  const filteredBase = useMemo(() => {
     return products.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      if (category === 'Favorites') {
-        return matchesSearch && favorites.includes(p.id);
-      }
-      if (category === 'Catalog') {
-        return matchesSearch;
-      }
+      if (category === 'Favorites') return matchesSearch && favorites.includes(p.id);
       if (category === 'Ofertas') {
-        // Una oferta es válida si tiene precio anterior mayor a 0 o es de la categoría Ofertas
         const hasDiscount = p.oldPrice && p.oldPrice > p.price;
         return matchesSearch && (hasDiscount || p.category === 'Ofertas');
       }
-      
-      return matchesSearch && p.category === category;
+      if (category !== 'Catalog') return matchesSearch && p.category === category;
+      return matchesSearch;
     });
   }, [category, searchTerm, favorites, products]);
 
-  const titles = {
-    Catalog: 'Todo Nuestro Mundo ✨',
-    Escolar: 'Útiles Escolares ✏️',
-    Regalaría: 'Para Regalar 🎁',
-    Oficina: 'Tu Oficina Matita 💼',
-    Tecnología: 'Tecnología & Más 🎧',
-    Novedades: '¡Recién Llegado! 🆕',
-    Ofertas: 'Precios Increíbles 🏷️',
-    Favorites: 'Mis Tesoros ❤️'
-  };
+  // 2. Agrupación por categorías para la vista "Catalog"
+  const groupedProducts = useMemo(() => {
+    if (category !== 'Catalog') return null;
+    
+    const groups: Record<string, Product[]> = {};
+    filteredBase.forEach(p => {
+      if (!groups[p.category]) groups[p.category] = [];
+      groups[p.category].push(p);
+    });
+    return groups;
+  }, [category, filteredBase]);
 
   if (loading) {
     return (
@@ -81,11 +86,12 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
   }
 
   return (
-    <div className="space-y-16 animate-fadeIn">
+    <div className="space-y-20 animate-fadeIn">
+      {/* Header y Buscador */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
         <div>
           <h2 className="text-6xl font-matita font-bold text-[#f6a118] drop-shadow-sm">
-            {titles[category as keyof typeof titles]}
+            {titles[category]}
           </h2>
           <p className="text-2xl font-matita text-gray-400 mt-2 italic">Descubre la magia de la papelería.</p>
         </div>
@@ -93,7 +99,7 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
         <div className="relative max-w-xl w-full group">
           <input
             type="text"
-            placeholder="Buscar por nombre..."
+            placeholder="Buscar en esta sección..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-10 py-5 rounded-[2.5rem] border-4 border-[#fadb31] focus:outline-none focus:ring-8 focus:ring-[#fadb31]/10 text-2xl font-matita shadow-xl transition-all"
@@ -106,13 +112,38 @@ const Catalog: React.FC<CatalogProps> = ({ category }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20">
-        {filteredProducts.map(product => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* Renderizado de Productos */}
+      {category === 'Catalog' && groupedProducts ? (
+        // VISTA POR SECCIONES (Catalog)
+        <div className="space-y-32">
+          {Object.entries(groupedProducts).map(([catName, catProducts]) => (
+            <div key={catName} className="space-y-10">
+              <div className="flex items-center gap-6">
+                <div className="h-1 flex-grow bg-gradient-to-r from-[#fadb31]/40 to-transparent rounded-full"></div>
+                <h3 className="text-4xl font-matita font-bold text-[#f6a118] bg-[#fef9eb] px-8 py-2 rounded-full border-2 border-[#fadb31]/20">
+                  {titles[catName] || catName}
+                </h3>
+                <div className="h-1 flex-grow bg-gradient-to-l from-[#fadb31]/40 to-transparent rounded-full"></div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20">
+                {catProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // VISTA SIMPLE (Categoría específica o Favoritos)
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20">
+          {filteredBase.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
-      {filteredProducts.length === 0 && (
+      {/* Empty State */}
+      {filteredBase.length === 0 && (
         <div className="text-center py-40 space-y-8">
           <div className="text-8xl opacity-40">🌸</div>
           <p className="text-4xl font-matita text-gray-300 italic">
