@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useApp } from '../App';
 import { Coupon } from '../types';
@@ -16,30 +15,30 @@ const ClubView: React.FC = () => {
   // LOGICA DE BLOQUEO PARA NO SOCIOS
   if (user && !user.isSocio) {
     return (
-      <div className="max-w-4xl mx-auto py-24 px-6 animate-fadeIn">
-        <div className="bg-white rounded-[5rem] p-16 md:p-24 shadow-matita border-[12px] border-[#ea7e9c]/10 text-center space-y-12 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-6 matita-gradient-pink"></div>
+      <div className="max-w-4xl mx-auto py-12 md:py-24 px-4 md:px-6 animate-fadeIn">
+        <div className="bg-white rounded-[3rem] md:rounded-[5rem] p-8 md:p-24 shadow-matita border-[6px] md:border-[12px] border-[#ea7e9c]/10 text-center space-y-8 md:space-y-12 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-4 md:h-6 matita-gradient-pink"></div>
           
           <div className="relative">
-            <div className="text-[12rem] mb-6 animate-bounce">🔐</div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-pink-100/50 rounded-full blur-3xl -z-10"></div>
+            <div className="text-[6rem] md:text-[12rem] mb-2 md:mb-6 animate-bounce">🔐</div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 md:w-48 h-24 md:h-48 bg-pink-100/50 rounded-full blur-2xl md:blur-3xl -z-10"></div>
           </div>
 
-          <div className="space-y-6">
-            <h2 className="text-6xl md:text-7xl font-bold text-gray-800">Espacio Premium</h2>
-            <p className="text-2xl md:text-3xl text-gray-500 italic max-w-2xl mx-auto leading-relaxed">
+          <div className="space-y-4 md:space-y-6">
+            <h2 className="text-4xl md:text-7xl font-bold text-gray-800">Espacio Premium</h2>
+            <p className="text-lg md:text-3xl text-gray-500 italic max-w-2xl mx-auto leading-relaxed">
               "Este rincón es exclusivo para nuestros **Socios Matita**. Únete hoy para canjear tus puntos por regalos mágicos y descuentos."
             </p>
           </div>
 
-          <div className="pt-10 flex flex-col items-center gap-6">
+          <div className="pt-4 md:pt-10 flex flex-col items-center gap-4 md:gap-6">
             <button 
               onClick={() => window.open(`https://wa.me/5493517587003?text=${encodeURIComponent("¡Hola Matita! 👋 Quiero ser socio del club para empezar a sumar puntos. ✨")}`, '_blank')}
-              className="px-16 py-8 matita-gradient-pink text-white rounded-[2.5rem] text-4xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all border-4 border-white"
+              className="w-full md:w-auto px-8 md:px-16 py-5 md:py-8 matita-gradient-pink text-white rounded-[1.5rem] md:rounded-[2.5rem] text-2xl md:text-4xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all border-2 md:border-4 border-white"
             >
               ¡Quiero ser Socio! 🌸
             </button>
-            <p className="text-gray-300 font-bold uppercase tracking-[0.3em] text-sm">Cada compra suma magia a tu cuenta</p>
+            <p className="text-gray-300 font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-xs md:text-sm">Cada compra suma magia a tu cuenta</p>
           </div>
         </div>
       </div>
@@ -74,51 +73,55 @@ const ClubView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-16 py-12 animate-fadeIn px-6">
-      {/* Card de Usuario */}
-      <div className="matita-gradient-orange rounded-[4rem] p-12 md:p-20 text-white shadow-2xl relative overflow-hidden border-[10px] border-white">
-        <div className="absolute -top-10 -right-10 p-20 opacity-10 transform rotate-12">
-          <svg className="w-80 h-80" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+    <div className="max-w-6xl mx-auto space-y-8 md:space-y-16 py-6 md:py-12 animate-fadeIn px-4 md:px-6">
+      {/* Card de Usuario - Adaptada a móviles */}
+      <div className="matita-gradient-orange rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-20 text-white shadow-2xl relative overflow-hidden border-[6px] md:border-[10px] border-white">
+        <div className="absolute -top-10 -right-10 p-10 md:p-20 opacity-10 transform rotate-12">
+          <svg className="w-40 md:w-80 h-40 md:h-80" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
         </div>
-        <div className="relative z-10 space-y-8">
+        <div className="relative z-10 space-y-6 md:space-y-8">
           <div>
-            <h2 className="text-5xl md:text-7xl font-bold">¡Hola, {user?.name}! ✨</h2>
-            <p className="text-2xl md:text-3xl opacity-90 font-bold uppercase tracking-widest mt-2">Mundo Club Matita</p>
+            <h2 className="text-4xl md:text-7xl font-bold leading-tight">¡Hola, {user?.name}! ✨</h2>
+            <p className="text-lg md:text-3xl opacity-90 font-bold uppercase tracking-widest mt-2">Mundo Club Matita</p>
           </div>
-          <div className="flex items-end gap-6 bg-white/20 backdrop-blur-md p-8 rounded-[3rem] border-2 border-white/30 inline-flex">
-            <span className="text-8xl md:text-[10rem] font-bold tracking-tighter leading-none">{user?.points}</span>
-            <span className="text-3xl md:text-4xl font-bold italic uppercase tracking-widest opacity-80 mb-4 text-orange-100">Puntos</span>
+          <div className="flex items-end gap-3 md:gap-6 bg-white/20 backdrop-blur-md p-5 md:p-8 rounded-[2rem] md:rounded-[3rem] border-2 border-white/30 inline-flex">
+            <span className="text-6xl md:text-[10rem] font-bold tracking-tighter leading-none">{user?.points}</span>
+            <span className="text-xl md:text-4xl font-bold italic uppercase tracking-widest opacity-80 mb-2 md:mb-4 text-orange-100">Puntos</span>
           </div>
         </div>
       </div>
 
-      {/* Cupones */}
-      <div className="space-y-12">
-        <h3 className="text-5xl md:text-6xl font-bold text-gray-800 text-center">Tus Beneficios 🎁</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {MOCK_COUPONS.map(coupon => (
-            <div 
-              key={coupon.id} 
-              className="bg-white border-8 border-dashed border-[#fadb31] rounded-[3.5rem] p-10 text-center space-y-8 shadow-xl hover:scale-105 transition-all group"
-            >
-              <div className="text-8xl group-hover:scale-125 transition-transform">🎫</div>
-              <div className="space-y-2">
-                <h4 className="text-4xl font-bold text-gray-800">${coupon.discount} OFF</h4>
-                <p className="text-xl text-gray-400 font-bold tracking-widest uppercase">Canje: {coupon.pointsRequired} Pts</p>
-              </div>
-              <button 
-                onClick={() => handleRedeem(coupon)}
-                disabled={redeeming === coupon.id || (user?.points || 0) < coupon.pointsRequired}
-                className={`w-full py-6 rounded-[2rem] text-3xl font-bold shadow-xl transition-all ${
-                  (user?.points || 0) < coupon.pointsRequired
-                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                    : 'matita-gradient-pink text-white hover:shadow-2xl active:scale-95'
-                }`}
+      {/* Cupones con DESLIZANTE en móviles y GRID en escritorio */}
+      <div className="space-y-8 md:space-y-12">
+        <h3 className="text-4xl md:text-6xl font-bold text-gray-800 text-center">Tus Beneficios 🎁</h3>
+        
+        {/* Contenedor del deslizante */}
+        <div className="overflow-x-auto no-scrollbar pb-8 -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-10 min-w-max md:min-w-full">
+            {MOCK_COUPONS.map(coupon => (
+              <div 
+                key={coupon.id} 
+                className="w-[280px] md:w-auto bg-white border-4 md:border-8 border-dashed border-[#fadb31] rounded-[2.5rem] md:rounded-[3.5rem] p-6 md:p-10 text-center space-y-6 md:space-y-8 shadow-xl hover:scale-105 transition-all group"
               >
-                {redeeming === coupon.id ? 'Canjeando...' : '¡Lo Quiero! ✨'}
-              </button>
-            </div>
-          ))}
+                <div className="text-6xl md:text-8xl group-hover:scale-125 transition-transform">🎫</div>
+                <div className="space-y-1 md:space-y-2">
+                  <h4 className="text-3xl md:text-4xl font-bold text-gray-800">${coupon.discount} OFF</h4>
+                  <p className="text-lg md:text-xl text-gray-400 font-bold tracking-widest uppercase">Canje: {coupon.pointsRequired} Pts</p>
+                </div>
+                <button 
+                  onClick={() => handleRedeem(coupon)}
+                  disabled={redeeming === coupon.id || (user?.points || 0) < coupon.pointsRequired}
+                  className={`w-full py-4 md:py-6 rounded-[1.5rem] md:rounded-[2rem] text-xl md:text-3xl font-bold shadow-xl transition-all ${
+                    (user?.points || 0) < coupon.pointsRequired
+                      ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                      : 'matita-gradient-pink text-white hover:shadow-2xl active:scale-95'
+                  }`}
+                >
+                  {redeeming === coupon.id ? 'Canjeando...' : '¡Lo Quiero! ✨'}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
